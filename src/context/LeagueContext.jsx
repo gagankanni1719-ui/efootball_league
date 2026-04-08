@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const LeagueContext = createContext();
 
@@ -16,21 +17,15 @@ const initialPlayers = [
 }));
 
 export const LeagueProvider = ({ children }) => {
-  const [players, setPlayers] = useState(() => {
-    const saved = localStorage.getItem('efootball_players');
-    if (saved) return JSON.parse(saved);
-    return initialPlayers;
-  });
+  const [players, setPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Still keep currentUser in localStorage since auth is hardcoded per browser
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('efootball_currentUser');
     if (saved) return JSON.parse(saved);
     return null;
   });
-
-  useEffect(() => {
-    localStorage.setItem('efootball_players', JSON.stringify(players));
-  }, [players]);
 
   useEffect(() => {
     if (currentUser) {
@@ -40,57 +35,86 @@ export const LeagueProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  const updatePlayerStats = (id, field, value) => {
-    setPlayers(players.map(p => {
-      if (p.id === id) {
-        return { ...p, [field]: p[field] + value };
-      }
-      return p;
-    }));
+  // Fetch from Supabase
+  const fetchPlayers = async () => {
+    const { data, error } = await supabase
+      .from('players')
+      .select('*')
+      .order('id', { ascending: true });
+      
+    if (error) {
+      console.error("Error fetching players:", error);
+    } else if (data && data.length > 0) {
+      setPlayers(data);
+    } else {
+      // If table is empty or missing, fallback to initial temporary state
+      setPlayers(initialPlayers);
+    }
+    setLoading(false);
   };
 
-  const setPlayerStats = (id, field, value) => {
-    setPlayers(players.map(p => {
-      if (p.id === id) {
-        return { ...p, [field]: Number(value) };
-      }
-      return p;
-    }));
+  useEffect(() => {
+    fetchPlayers();
+
+    // Subscribe to realtime updates
+    const subscription = supabase
+      .channel('players_channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, payload => {
+        // Sync local state when remote changes
+        fetchPlayers();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
+
+  const updatePlayerStats = async (id, field, value) => {
+    const player = players.find(p => p.id === id);
+    if (!player) return;
+    
+    const newValue = player[field] + value;
+    // Optimistic update
+    setPlayers(players.map(p => p.id === id ? { ...p, [field]: newValue } : p));
+    
+    // Sync with Supabase
+    await supabase.from('players').update({ [field]: newValue }).eq('id', id);
   };
 
-  const updatePlayerImage = (id, newImageUrl) => {
-    setPlayers(players.map(p => {
-      if (p.id === id) {
-        return { ...p, image: newImageUrl };
-      }
-      return p;
-    }));
+  const setPlayerStats = async (id, field, value) => {
+    const numValue = Number(value);
+    setPlayers(players.map(p => p.id === id ? { ...p, [field]: numValue } : p));
+    await supabase.from('players').update({ [field]: numValue }).eq('id', id);
   };
 
-  const updatePlayerFlag = (id, flagEmoji) => {
-    setPlayers(players.map(p => {
-      if (p.id === id) {
-        return { ...p, flag: flagEmoji };
-      }
-      return p;
-    }));
+  const updatePlayerImage = async (id, newImageUrl) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, image: newImageUrl } : p));
+    await supabase.from('players').update({ image: newImageUrl }).eq('id', id);
   };
 
-  const resetStats = (id) => {
-    setPlayers(players.map(p => {
-      if (p.id === id) {
-        return { ...p, goals: 0, leaguesWon: 0 };
-      }
-      return p;
-    }));
+  const updatePlayerFlag = async (id, flagEmoji) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, flag: flagEmoji } : p));
+    await supabase.from('players').update({ flag: flagEmoji }).eq('id', id);
   };
 
-  const resetAllStats = () => {
+  const resetStats = async (id) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, goals: 0, leaguesWon: 0 } : p));
+    await supabase.from('players').update({ goals: 0, leaguesWon: 0 }).eq('id', id);
+  };
+
+  const resetAllStats = async () => {
     setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0 })));
+    
+    // Supabase standard bulk update workaround or individual updates
+    for (const p of players) {
+      await supabase.from('players').update({ goals: 0, leaguesWon: 0 }).eq('id', p.id);
+    }
   };
 
   const hardResetApp = () => {
-    localStorage.removeItem('efootball_players');
+    // We only clear the current user login session now
+    localStorage.clear();
     window.location.reload();
   };
 
@@ -105,9 +129,14 @@ export const LeagueProvider = ({ children }) => {
       updatePlayerFlag,
       resetStats,
       resetAllStats,
-      hardResetApp
+      hardResetApp,
+      loading
     }}>
-      {children}
+      {!loading ? children : (
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+        </div>
+      )}
     </LeagueContext.Provider>
   );
 };
