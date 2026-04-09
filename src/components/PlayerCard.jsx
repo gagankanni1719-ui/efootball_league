@@ -14,7 +14,6 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
   const played = (player.matchesWon || 0) + (player.matchesDrawn || 0) + (player.matchesLost || 0);
   const isOnFire = (player.winStreak || 0) >= 3;
   const isBrickWall = played >= 3 && (player.goalsAgainst || 0) === 0;
-  const isGiantSlayer = player.giantSlayer === true;
 
   const handleSaveProfile = () => {
     if (newPfpUrl.trim() !== '') {
@@ -157,7 +156,7 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
         </h3>
 
         {/* Achievement Badges */}
-        {(isOnFire || isBrickWall || isGiantSlayer) && (
+        {(isOnFire || isBrickWall) && (
           <div className="flex flex-wrap justify-center gap-2 mb-4 w-full px-2">
             {isOnFire && (
               <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded shadow-lg border border-red-400/50" title="On Fire (3+ Win Streak)">
@@ -167,11 +166,6 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
             {isBrickWall && (
               <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-slate-500 to-slate-700 text-white rounded shadow-lg border border-slate-400/50" title="Brick Wall (0 Goals Conceded in 3+ Games)">
                 🛡️ Brick Wall
-              </span>
-            )}
-            {isGiantSlayer && (
-              <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded shadow-lg border border-purple-400/50" title="Giant Slayer (Beat #1 Ranked Player)">
-                🗡️ Giant Slayer
               </span>
             )}
           </div>

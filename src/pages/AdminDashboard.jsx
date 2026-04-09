@@ -91,7 +91,6 @@ const AdminDashboard = () => {
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Losses">Matches Lost</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Goals Conceded">Goals Against</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Current Winning Streak">Win Streak</th>
-                  <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Beat the current #1">Giant Slayer</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-right">Reset Form</th>
                 </tr>
               </thead>
@@ -183,16 +182,6 @@ const AdminDashboard = () => {
                           <button onClick={() => handleAdjust(player.id, 'winStreak', -1)} className="p-1.5 rounded bg-white/5 hover:bg-yellow-500/20 text-yellow-500"><Minus size={14} /></button>
                         </div>
                       </div>
-                    </td>
-
-                    <td className="px-4 py-4 text-center">
-                      <button 
-                        onClick={() => setDraftPlayers(current => current.map(p => p.id === player.id ? { ...p, giantSlayer: !p.giantSlayer } : p))}
-                        className={`px-4 py-2 rounded-lg font-bold transition-all border ${player.giantSlayer ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.3)]' : 'bg-slate-900/50 text-slate-500 border-white/10 hover:text-white'}`}
-                        title="Toggle Giant Slayer status"
-                      >
-                        {player.giantSlayer ? 'YES' : 'NO'}
-                      </button>
                     </td>
 
                     <td className="px-4 py-4 text-right">
