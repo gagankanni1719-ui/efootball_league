@@ -6,11 +6,11 @@ const LeagueContext = createContext();
 export const useLeague = () => useContext(LeagueContext);
 
 const initialPlayers = [
-  { id: '1', username: 'Shubham Hande', password: 'password', name: 'Shubham Hande', goals: 0, leaguesWon: 0, flag: '🌍' },
-  { id: '2', username: 'Gagan Kanni', password: 'password', name: 'Gagan Kanni', goals: 0, leaguesWon: 0, flag: '🌍' },
-  { id: '3', username: 'Sudeep Hilli', password: 'password', name: 'Sudeep Hilli', goals: 0, leaguesWon: 0, flag: '🌍' },
-  { id: '4', username: 'Prajwal Kasture', password: 'password', name: 'Prajwal Kasture', goals: 0, leaguesWon: 0, flag: '🌍' },
-  { id: '5', username: 'Anil Hilli', password: 'password', name: 'Anil Hilli', goals: 0, leaguesWon: 0, flag: '🌍' },
+  { id: '1', username: 'Shubham Hande', password: 'password', name: 'Shubham Hande', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
+  { id: '2', username: 'Gagan Kanni', password: 'password', name: 'Gagan Kanni', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
+  { id: '3', username: 'Sudeep Hilli', password: 'password', name: 'Sudeep Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
+  { id: '4', username: 'Prajwal Kasture', password: 'password', name: 'Prajwal Kasture', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
+  { id: '5', username: 'Anil Hilli', password: 'password', name: 'Anil Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
 ].map(p => ({
   ...p,
   image: `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=1e293b&color=fff&size=150`
@@ -99,16 +99,42 @@ export const LeagueProvider = ({ children }) => {
   };
 
   const resetStats = async (id) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, goals: 0, leaguesWon: 0 } : p));
-    await supabase.from('players').update({ goals: 0, leaguesWon: 0 }).eq('id', id);
+    setPlayers(players.map(p => p.id === id ? { ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 } : p));
+    await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', id);
   };
 
   const resetAllStats = async () => {
-    setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0 })));
+    setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 })));
     
     // Supabase standard bulk update workaround or individual updates
     for (const p of players) {
-      await supabase.from('players').update({ goals: 0, leaguesWon: 0 }).eq('id', p.id);
+      await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', p.id);
+    }
+  };
+
+  const saveMultiplePlayers = async (updatedPlayers) => {
+    setPlayers(updatedPlayers);
+    let hasError = false;
+    let errorMessage = '';
+
+    for (const p of updatedPlayers) {
+      const { error } = await supabase.from('players').update({
+        goals: p.goals,
+        leaguesWon: p.leaguesWon,
+        matchesWon: p.matchesWon,
+        matchesLost: p.matchesLost,
+        matchesDrawn: p.matchesDrawn
+      }).eq('id', p.id);
+      
+      if (error) {
+        hasError = true;
+        errorMessage = error.message;
+        console.error("Supabase Save Error for player", p.id, error);
+      }
+    }
+
+    if (hasError) {
+      alert("Failed to save changes to the database! Did you run the SQL command in Supabase to add the new columns?\n\nError details: " + errorMessage);
     }
   };
 
@@ -129,6 +155,7 @@ export const LeagueProvider = ({ children }) => {
       updatePlayerFlag,
       resetStats,
       resetAllStats,
+      saveMultiplePlayers,
       hardResetApp,
       loading
     }}>

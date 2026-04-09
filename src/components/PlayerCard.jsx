@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { clsx } from 'clsx';
-import { Trophy, Goal, Camera, Check, X } from 'lucide-react';
+import { Trophy, Goal, Camera, Check, X, Star } from 'lucide-react';
 import { useLeague } from '../context/LeagueContext';
 
 const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
@@ -127,17 +127,29 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
         </h3>
 
         {/* Stats Grid */}
-        <div className="w-full grid grid-cols-2 gap-4 mt-auto">
-          <div className="flex flex-col items-center p-3 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
-            <Goal className="w-5 h-5 text-emerald-400 mb-1" />
-            <span className="text-2xl font-bold font-oswald">{player.goals}</span>
-            <span className="text-[10px] text-slate-400 uppercase tracking-widest">Goals</span>
+        <div className="w-full grid grid-cols-3 gap-2 mt-auto">
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+            <Star className="w-4 h-4 text-indigo-400 mb-1" />
+            <span className="text-xl font-bold font-oswald">{(player.matchesWon || 0) * 3 + (player.matchesDrawn || 0)}</span>
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest">Pts</span>
           </div>
-          <div className="flex flex-col items-center p-3 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
-            <Trophy className="w-5 h-5 text-yellow-400 mb-1" />
-            <span className="text-2xl font-bold font-oswald">{player.leaguesWon}</span>
-            <span className="text-[10px] text-slate-400 uppercase tracking-widest">Leagues</span>
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+            <Goal className="w-4 h-4 text-emerald-400 mb-1" />
+            <span className="text-xl font-bold font-oswald">{player.goals}</span>
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest">Goals</span>
           </div>
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+            <Trophy className="w-4 h-4 text-yellow-400 mb-1" />
+            <span className="text-xl font-bold font-oswald">{player.leaguesWon}</span>
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest">Leagues</span>
+          </div>
+        </div>
+
+        {/* Form Tracker (W-D-L) */}
+        <div className="mt-3 text-xs font-oswald tracking-widest text-slate-400 flex gap-2">
+          <span className="text-emerald-400" title="Wins">{player.matchesWon || 0}W</span> - 
+          <span className="text-slate-300" title="Draws">{player.matchesDrawn || 0}D</span> - 
+          <span className="text-red-400" title="Losses">{player.matchesLost || 0}L</span>
         </div>
       </div>
     </div>

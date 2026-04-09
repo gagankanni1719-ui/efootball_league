@@ -10,9 +10,13 @@ const Home = () => {
   const maxGoals = Math.max(...players.map(p => p.goals));
   const topScorerIds = players.filter(p => p.goals === maxGoals && maxGoals > 0).map(p => p.id);
 
-  // Find league leader
-  const maxLeagues = Math.max(...players.map(p => p.leaguesWon));
-  const leagueLeaderIds = players.filter(p => p.leaguesWon === maxLeagues && maxLeagues > 0).map(p => p.id);
+  // Find league leader (by points now)
+  const playersWithPoints = players.map(p => ({
+    ...p,
+    points: (p.matchesWon || 0) * 3 + (p.matchesDrawn || 0) * 1
+  }));
+  const maxPoints = Math.max(...playersWithPoints.map(p => p.points));
+  const leagueLeaderIds = playersWithPoints.filter(p => p.points === maxPoints && maxPoints > 0).map(p => p.id);
 
   return (
     <div className="space-y-12">
