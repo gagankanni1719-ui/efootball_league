@@ -96,11 +96,22 @@ const Leaderboard = ({ players }) => {
             <div 
               key={player.id}
               className={clsx(
-                "flex items-center justify-between p-4 rounded-xl border transition-colors",
-                index === 0 ? "bg-yellow-500/10 border-yellow-500/30" : "bg-white/5 border-white/5 hover:bg-white/10"
+                "relative flex items-center justify-between p-4 rounded-xl border transition-colors overflow-hidden group",
+                index === 0 && player.goals < 10 ? "bg-yellow-500/10 border-yellow-500/30" : "bg-white/5 border-white/5 hover:bg-white/10",
+                player.goals >= 10 && "border-white/20 shadow-[0_0_15px_rgba(34,197,94,0.2)] ring-1 ring-white/30"
               )}
             >
-              <div className="flex items-center gap-4">
+              {player.goals >= 10 && (
+                <>
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay z-0 transition-transform duration-700 group-hover:scale-110"
+                    style={{ backgroundImage: "url('/epic-10-goals.jpg')" }}
+                  />
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0" />
+                </>
+              )}
+              
+              <div className="flex items-center gap-4 relative z-10">
                 <div className="w-8 flex justify-center">
                   {getRankIcon(index)}
                 </div>
@@ -109,7 +120,7 @@ const Leaderboard = ({ players }) => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 bg-slate-950/50 px-4 py-2 rounded-lg">
+              <div className="flex items-center gap-2 bg-slate-950/50 px-4 py-2 rounded-lg relative z-10 glassmorphism border border-white/10">
                 <span className="font-oswald text-2xl font-bold text-emerald-400">{player.goals}</span>
                 <span className="text-xs text-slate-400 uppercase">Goals</span>
               </div>

@@ -6,11 +6,11 @@ const LeagueContext = createContext();
 export const useLeague = () => useContext(LeagueContext);
 
 const initialPlayers = [
-  { id: '1', username: 'Shubham Hande', password: 'password', name: 'Shubham Hande', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
-  { id: '2', username: 'Gagan Kanni', password: 'password', name: 'Gagan Kanni', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
-  { id: '3', username: 'Sudeep Hilli', password: 'password', name: 'Sudeep Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
-  { id: '4', username: 'Prajwal Kasture', password: 'password', name: 'Prajwal Kasture', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
-  { id: '5', username: 'Anil Hilli', password: 'password', name: 'Anil Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, flag: '🌍' },
+  { id: '1', username: 'Shubham Hande', password: 'password', name: 'Shubham Hande', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false, flag: '🌍' },
+  { id: '2', username: 'Gagan Kanni', password: 'password', name: 'Gagan Kanni', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false, flag: '🌍' },
+  { id: '3', username: 'Sudeep Hilli', password: 'password', name: 'Sudeep Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false, flag: '🌍' },
+  { id: '4', username: 'Prajwal Kasture', password: 'password', name: 'Prajwal Kasture', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false, flag: '🌍' },
+  { id: '5', username: 'Anil Hilli', password: 'password', name: 'Anil Hilli', goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false, flag: '🌍' },
 ].map(p => ({
   ...p,
   image: `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=1e293b&color=fff&size=150`
@@ -99,26 +99,26 @@ export const LeagueProvider = ({ children }) => {
   };
 
   const resetStats = async (id) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 } : p));
-    await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', id);
+    setPlayers(players.map(p => p.id === id ? { ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false } : p));
+    await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false }).eq('id', id);
   };
 
   const resetAllStats = async () => {
-    setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 })));
+    setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false })));
     for (const p of players) {
-      await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', p.id);
+      await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false }).eq('id', p.id);
     }
   };
 
   const resetLeagueForm = async (id) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 } : p));
-    await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', id);
+    setPlayers(players.map(p => p.id === id ? { ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false } : p));
+    await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false }).eq('id', id);
   };
 
   const resetAllLeagueForm = async () => {
-    setPlayers(players.map(p => ({ ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 })));
+    setPlayers(players.map(p => ({ ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false })));
     for (const p of players) {
-      await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', p.id);
+      await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0, winStreak: 0, goalsAgainst: 0, giantSlayer: false }).eq('id', p.id);
     }
   };
 
@@ -133,7 +133,10 @@ export const LeagueProvider = ({ children }) => {
         leaguesWon: p.leaguesWon,
         matchesWon: p.matchesWon,
         matchesLost: p.matchesLost,
-        matchesDrawn: p.matchesDrawn
+        matchesDrawn: p.matchesDrawn,
+        winStreak: p.winStreak,
+        goalsAgainst: p.goalsAgainst,
+        giantSlayer: p.giantSlayer
       }).eq('id', p.id);
       
       if (error) {

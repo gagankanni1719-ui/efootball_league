@@ -10,6 +10,11 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
   const [newFlag, setNewFlag] = useState(player.flag || '🌍');
 
   const isEpic = player.goals >= 10;
+  
+  const played = (player.matchesWon || 0) + (player.matchesDrawn || 0) + (player.matchesLost || 0);
+  const isOnFire = (player.winStreak || 0) >= 3;
+  const isBrickWall = played >= 3 && (player.goalsAgainst || 0) === 0;
+  const isGiantSlayer = player.giantSlayer === true;
 
   const handleSaveProfile = () => {
     if (newPfpUrl.trim() !== '') {
@@ -40,7 +45,7 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
           !isEpic && !isTopScorer && isLeagueLeader && "bg-gradient-to-br from-yellow-500 via-yellow-800 to-slate-900",
           !isEpic && !isTopScorer && !isLeagueLeader && "bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-950"
         )}
-        style={isEpic ? { backgroundImage: "url('/epic-bg.png')" } : {}}
+        style={isEpic ? { backgroundImage: "url('/epic-10-goals.jpg')" } : {}}
       />
 
       {/* Glossy Overlay & Epic FX */}
@@ -54,7 +59,7 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
         className={clsx(
           "relative p-6 flex flex-col items-center h-full z-10 bg-transparent border-none",
           !isEpic && "glassmorphism",
-          isEpic && "bg-black/10"
+          isEpic && "bg-black/20 backdrop-blur-sm border border-white/20 rounded-2xl"
         )}
       >
         
@@ -146,24 +151,45 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
           </div>
         )}
 
-        <h3 className="flex items-center justify-center gap-2 font-oswald text-2xl font-bold uppercase tracking-wide mb-6">
+        <h3 className="flex items-center justify-center gap-2 font-oswald text-2xl font-bold uppercase tracking-wide mb-4">
           <span className="text-2xl" title="Player Nationality">{player.flag || '🌍'}</span>
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 line-clamp-1">{player.name}</span>
         </h3>
 
+        {/* Achievement Badges */}
+        {(isOnFire || isBrickWall || isGiantSlayer) && (
+          <div className="flex flex-wrap justify-center gap-2 mb-4 w-full px-2">
+            {isOnFire && (
+              <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded shadow-lg border border-red-400/50" title="On Fire (3+ Win Streak)">
+                🔥 On Fire
+              </span>
+            )}
+            {isBrickWall && (
+              <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-slate-500 to-slate-700 text-white rounded shadow-lg border border-slate-400/50" title="Brick Wall (0 Goals Conceded in 3+ Games)">
+                🛡️ Brick Wall
+              </span>
+            )}
+            {isGiantSlayer && (
+              <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded shadow-lg border border-purple-400/50" title="Giant Slayer (Beat #1 Ranked Player)">
+                🗡️ Giant Slayer
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Stats Grid */}
         <div className="w-full grid grid-cols-3 gap-2 mt-auto">
-          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/20 border border-white/20 backdrop-blur-md group-hover:bg-white/30 transition-colors">
             <Star className="w-4 h-4 text-indigo-400 mb-1" />
             <span className="text-xl font-bold font-oswald">{(player.matchesWon || 0) * 3 + (player.matchesDrawn || 0)}</span>
             <span className="text-[9px] text-slate-400 uppercase tracking-widest">Pts</span>
           </div>
-          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/20 border border-white/20 backdrop-blur-md group-hover:bg-white/30 transition-colors">
             <Goal className="w-4 h-4 text-emerald-400 mb-1" />
             <span className="text-xl font-bold font-oswald">{player.goals}</span>
             <span className="text-[9px] text-slate-400 uppercase tracking-widest">Goals</span>
           </div>
-          <div className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+          <div className="flex flex-col items-center p-2 rounded-xl bg-white/20 border border-white/20 backdrop-blur-md group-hover:bg-white/30 transition-colors">
             <Trophy className="w-4 h-4 text-yellow-400 mb-1" />
             <span className="text-xl font-bold font-oswald">{player.leaguesWon}</span>
             <span className="text-[9px] text-slate-400 uppercase tracking-widest">Leagues</span>

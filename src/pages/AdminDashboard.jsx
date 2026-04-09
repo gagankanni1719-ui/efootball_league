@@ -89,6 +89,9 @@ const AdminDashboard = () => {
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Wins">Matches Won</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Draws">Matches Drawn</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Losses">Matches Lost</th>
+                  <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Goals Conceded">Goals Against</th>
+                  <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Current Winning Streak">Win Streak</th>
+                  <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-center" title="Beat the current #1">Giant Slayer</th>
                   <th className="px-4 py-4 font-oswald tracking-wider uppercase text-slate-400 text-right">Reset Form</th>
                 </tr>
               </thead>
@@ -148,6 +151,48 @@ const AdminDashboard = () => {
                           <button onClick={() => handleAdjust(player.id, 'matchesLost', -1)} className="p-1.5 rounded bg-white/5 hover:bg-red-500/20 text-red-400"><Minus size={14} /></button>
                         </div>
                       </div>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <input 
+                          type="number"
+                          value={player.goalsAgainst || 0}
+                          onChange={(e) => handleInputChange(player.id, 'goalsAgainst', e.target.value)}
+                          className="w-16 bg-slate-900/50 border border-white/10 rounded-lg px-2 py-1 text-xl font-oswald font-bold text-center text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                          min="0"
+                        />
+                        <div className="flex gap-1">
+                          <button onClick={() => handleAdjust(player.id, 'goalsAgainst', 1)} className="p-1.5 rounded bg-white/5 hover:bg-orange-500/20 text-orange-400"><Plus size={14} /></button>
+                          <button onClick={() => handleAdjust(player.id, 'goalsAgainst', -1)} className="p-1.5 rounded bg-white/5 hover:bg-orange-500/20 text-orange-400"><Minus size={14} /></button>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <input 
+                          type="number"
+                          value={player.winStreak || 0}
+                          onChange={(e) => handleInputChange(player.id, 'winStreak', e.target.value)}
+                          className="w-16 bg-slate-900/50 border border-white/10 rounded-lg px-2 py-1 text-xl font-oswald font-bold text-center text-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+                          min="0"
+                        />
+                        <div className="flex gap-1">
+                          <button onClick={() => handleAdjust(player.id, 'winStreak', 1)} className="p-1.5 rounded bg-white/5 hover:bg-yellow-500/20 text-yellow-500"><Plus size={14} /></button>
+                          <button onClick={() => handleAdjust(player.id, 'winStreak', -1)} className="p-1.5 rounded bg-white/5 hover:bg-yellow-500/20 text-yellow-500"><Minus size={14} /></button>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <button 
+                        onClick={() => setDraftPlayers(current => current.map(p => p.id === player.id ? { ...p, giantSlayer: !p.giantSlayer } : p))}
+                        className={`px-4 py-2 rounded-lg font-bold transition-all border ${player.giantSlayer ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.3)]' : 'bg-slate-900/50 text-slate-500 border-white/10 hover:text-white'}`}
+                        title="Toggle Giant Slayer status"
+                      >
+                        {player.giantSlayer ? 'YES' : 'NO'}
+                      </button>
                     </td>
 
                     <td className="px-4 py-4 text-right">
