@@ -105,10 +105,20 @@ export const LeagueProvider = ({ children }) => {
 
   const resetAllStats = async () => {
     setPlayers(players.map(p => ({ ...p, goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 })));
-    
-    // Supabase standard bulk update workaround or individual updates
     for (const p of players) {
       await supabase.from('players').update({ goals: 0, leaguesWon: 0, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', p.id);
+    }
+  };
+
+  const resetLeagueForm = async (id) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 } : p));
+    await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', id);
+  };
+
+  const resetAllLeagueForm = async () => {
+    setPlayers(players.map(p => ({ ...p, matchesWon: 0, matchesLost: 0, matchesDrawn: 0 })));
+    for (const p of players) {
+      await supabase.from('players').update({ matchesWon: 0, matchesLost: 0, matchesDrawn: 0 }).eq('id', p.id);
     }
   };
 
@@ -155,6 +165,8 @@ export const LeagueProvider = ({ children }) => {
       updatePlayerFlag,
       resetStats,
       resetAllStats,
+      resetLeagueForm,
+      resetAllLeagueForm,
       saveMultiplePlayers,
       hardResetApp,
       loading

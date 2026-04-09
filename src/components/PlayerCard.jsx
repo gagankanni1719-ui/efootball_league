@@ -9,6 +9,8 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
   const [newPfpUrl, setNewPfpUrl] = useState(player.image);
   const [newFlag, setNewFlag] = useState(player.flag || '🌍');
 
+  const isEpic = player.goals >= 10;
+
   const handleSaveProfile = () => {
     if (newPfpUrl.trim() !== '') {
       updatePlayerImage(player.id, newPfpUrl);
@@ -22,39 +24,62 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
   return (
     <div className={clsx(
       "relative group rounded-2xl overflow-hidden transition-all duration-500",
-      "hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20",
-      isCurrentUser ? "ring-2 ring-indigo-500 ring-offset-4 ring-offset-slate-950 scale-[1.02]" : "border border-white/10"
+      "hover:scale-[1.03] hover:-translate-y-2",
+      isEpic 
+        ? "hover:shadow-[0_0_40px_rgba(34,197,94,0.5)] shadow-[0_0_15px_rgba(34,197,94,0.2)] ring-2 ring-green-400/80 ring-offset-4 ring-offset-slate-950" 
+        : "hover:shadow-2xl hover:shadow-indigo-500/20",
+      !isEpic && isCurrentUser ? "ring-2 ring-indigo-500 ring-offset-4 ring-offset-slate-950 scale-[1.02]" : "",
+      !isEpic && !isCurrentUser ? "border border-white/10" : ""
     )}>
-      {/* Background Gradient */}
-      <div className={clsx(
-        "absolute inset-0 opacity-80 transition-opacity group-hover:opacity-100",
-        isTopScorer 
-          ? "bg-gradient-to-br from-orange-600 via-red-900 to-slate-900" 
-          : isLeagueLeader 
-            ? "bg-gradient-to-br from-yellow-500 via-yellow-800 to-slate-900"
-            : "bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-950"
-      )} />
+      {/* Background Gradient / Image */}
+      <div 
+        className={clsx(
+          "absolute inset-0 opacity-100 transition-opacity group-hover:opacity-100",
+          isEpic && "bg-cover bg-center brightness-[0.8] contrast-[1.2]",
+          !isEpic && isTopScorer && "bg-gradient-to-br from-orange-600 via-red-900 to-slate-900",
+          !isEpic && !isTopScorer && isLeagueLeader && "bg-gradient-to-br from-yellow-500 via-yellow-800 to-slate-900",
+          !isEpic && !isTopScorer && !isLeagueLeader && "bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-950"
+        )}
+        style={isEpic ? { backgroundImage: "url('/epic-bg.png')" } : {}}
+      />
 
-      {/* Glossy Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-50" />
+      {/* Glossy Overlay & Epic FX */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-50 pointer-events-none" />
+      {isEpic && (
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-400/30 to-transparent mix-blend-overlay animate-pulse pointer-events-none" />
+      )}
 
       {/* Content */}
-      <div className="relative p-6 flex flex-col items-center h-full z-10 glassmorphism bg-transparent border-none">
+      <div 
+        className={clsx(
+          "relative p-6 flex flex-col items-center h-full z-10 bg-transparent border-none",
+          !isEpic && "glassmorphism",
+          isEpic && "bg-black/10"
+        )}
+      >
         
         {/* Badges */}
-        <div className="absolute top-4 w-full px-4 flex justify-between">
-          {isTopScorer && (
-            <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-md shadow-lg shadow-red-900/50">
-              🔥 TOP SCORER
-            </span>
-          )}
-          {isLeagueLeader && !isTopScorer && (
-            <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 rounded-md shadow-lg shadow-yellow-900/50">
-              👑 LEADER
-            </span>
-          )}
+        <div className="absolute top-4 w-full px-4 flex justify-between z-30 pointer-events-none">
+          <div className="flex flex-col gap-1">
+            {isEpic && (
+              <span className="inline-flex w-fit items-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-green-100 via-green-400 to-green-600 text-green-950 rounded-md shadow-[0_0_15px_rgba(34,197,94,0.6)] border border-green-300">
+                ✨ EPIC
+              </span>
+            )}
+            {isTopScorer && (
+              <span className="inline-flex w-fit items-center gap-1 text-xs font-bold px-2 py-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-md shadow-lg shadow-red-900/50">
+                🔥 TOP SCORER
+              </span>
+            )}
+            {isLeagueLeader && !isTopScorer && (
+              <span className="inline-flex w-fit items-center gap-1 text-xs font-bold px-2 py-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 rounded-md shadow-lg shadow-yellow-900/50">
+                👑 LEADER
+              </span>
+            )}
+          </div>
+          
           {isCurrentUser && (
-            <span className="ml-auto text-xs font-bold px-2 py-1 bg-indigo-500 rounded-md shadow-lg shadow-indigo-900/50">
+            <span className="h-fit ml-auto text-xs font-bold px-2 py-1 bg-indigo-500 rounded-md shadow-lg shadow-indigo-900/50">
               YOU
             </span>
           )}
