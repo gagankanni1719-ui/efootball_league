@@ -12,7 +12,6 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
   const isEpic = player.goals >= 10;
   
   const played = (player.matchesWon || 0) + (player.matchesDrawn || 0) + (player.matchesLost || 0);
-  const isOnFire = (player.winStreak || 0) >= 3;
 
   const handleSaveProfile = () => {
     if (newPfpUrl.trim() !== '') {
@@ -153,15 +152,6 @@ const PlayerCard = ({ player, isCurrentUser, isTopScorer, isLeagueLeader }) => {
           <span className="text-2xl" title="Player Nationality">{player.flag || '🌍'}</span>
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 line-clamp-1">{player.name}</span>
         </h3>
-
-        {/* Achievement Badges */}
-        {isOnFire && (
-          <div className="flex flex-wrap justify-center gap-2 mb-4 w-full px-2">
-            <span className="inline-flex flex-1 whitespace-nowrap items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded shadow-lg border border-red-400/50" title="On Fire (3+ Win Streak)">
-              🔥 On Fire
-            </span>
-          </div>
-        )}
 
         {/* Stats Grid */}
         <div className="w-full grid grid-cols-3 gap-2 mt-auto">
